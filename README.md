@@ -1,2 +1,2 @@
-# tiktok-live-to-telegram-notification
+# TIkTok Live to Telegram Notification
 TIkTok Live to Telegram Notification
