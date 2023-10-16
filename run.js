@@ -2,7 +2,7 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const moment = require('moment-timezone');
 
-// Fungsi untuk mendapatkan timestamp dengan format [HH:mm DD/MM/YYYY] di zona waktu Jakarta
+// Function to get a timestamp in the [HH:mm DD/MM/YYYY] format in the Jakarta timezone
 function getTimestamp() {
   const currentDate = moment().tz('Asia/Jakarta');
   const hours = currentDate.format('HH');
@@ -14,54 +14,54 @@ function getTimestamp() {
   return `[${hours}:${minutes} ${day}/${month}/${year}]`;
 }
 
-// Fungsi untuk memeriksa apakah pengguna sedang melakukan siaran langsung (live)
+// Function to check if a user is currently live streaming
 async function checkLiveStatus(username) {
   try {
     const profileUrl = `https://www.tiktok.com/@${username}`;
     const response = await axios.get(profileUrl);
     const html = response.data;
 
-    // Menggunakan cheerio untuk memparsing HTML
+    // Using cheerio to parse HTML
     const $ = cheerio.load(html);
     const liveLink = $('a[target="tiktok_live_view_window"]').attr('href');
 
-    // Jika terdapat tautan live, pengguna sedang melakukan siaran langsung
+    // If there's a live link, the user is live streaming
     if (liveLink) {
       return true;
     } else {
       return false;
     }
   } catch (error) {
-    throw new Error(`${getTimestamp()} Gagal memeriksa status siaran langsung: ${error.message}`);
+    throw new Error(`${getTimestamp()} Failed to check live streaming status: ${error.message}`);
   }
 }
 
-// Fungsi untuk mengirim notifikasi ke Telegram
+// Function to send notifications to Telegram
 async function sendTelegramNotification(message) {
   try {
-    const telegramApiUrl = 'https://api.telegram.org/xxxxxxx/sendMessage'; // Token Telegram
-    const chatId = 'xxxxxxx'; // Chat id
+    const telegramApiUrl = 'https://api.telegram.org/xxxxxxx/sendMessage'; // Telegram Token
+    const chatId = 'xxxxxxx'; // Chat ID
 
     const response = await axios.post(telegramApiUrl, {
       chat_id: chatId,
       text: message,
     });
 
-    // Memeriksa status pengiriman notifikasi
+    // Checking the notification sending status
     if (response.status === 200) {
-      console.log(`${getTimestamp()} Notifikasi berhasil dikirim ke Telegram.`);
+      console.log(`${getTimestamp()} Notification sent to Telegram successfully.`);
     } else {
-      throw new Error(`${getTimestamp()} Gagal mengirim notifikasi ke Telegram.`);
+      throw new Error(`${getTimestamp()} Failed to send notification to Telegram.`);
     }
   } catch (error) {
-    throw new Error(`${getTimestamp()} Gagal mengirim notifikasi ke Telegram: ${error.message}`);
+    throw new Error(`${getTimestamp()} Failed to send notification to Telegram: ${error.message}`);
   }
 }
 
-// Variabel untuk melacak waktu terakhir notifikasi dikirim untuk setiap username
+// Variable to track the last notification time for each username
 const lastNotificationTimes = {};
 
-// Fungsi untuk melakukan pengecekan status siaran langsung dan mengirim notifikasi ke Telegram
+// Function to check live streaming status and send notifications to Telegram
 async function checkLiveStatusAndSendNotification(username) {
   try {
     const isLive = await checkLiveStatus(username);
@@ -70,29 +70,29 @@ async function checkLiveStatusAndSendNotification(username) {
       const currentTime = new Date();
 
       if (!lastNotificationTimes[username] || currentTime - lastNotificationTimes[username] >= 3 * 60 * 60 * 1000) {
-        const message = `${username} sedang melakukan siaran langsung\n\nhttps://www.tiktok.com/@${username}/live`;
+        const message = `${username} is currently live streaming\n\nhttps://www.tiktok.com/@${username}/live`;
         await sendTelegramNotification(message);
         lastNotificationTimes[username] = currentTime;
       } else {
-        console.log(`${getTimestamp()} Pengguna @${username} sedang melakukan siaran langsung, tetapi notifikasi hanya dikirim setiap 3 jam.`);
+        console.log(`${getTimestamp()} User @${username} is live streaming, but notifications are only sent every 3 hours.`);
       }
     } else {
-      console.log(`${getTimestamp()} Pengguna @${username} tidak sedang melakukan siaran langsung.`);
+      console.log(`${getTimestamp()} User @${username} is not currently live streaming.`);
     }
   } catch (error) {
-    console.error(`${getTimestamp()} Gagal memeriksa status siaran langsung dan mengirim notifikasi untuk pengguna @${username}:`, error.message);
+    console.error(`${getTimestamp()} Failed to check live streaming status and send notifications for user @${username}:`, error.message);
   }
 }
 
-// Daftar username yang ingin diperiksa
+// List of usernames to be checked
 const usernames = ['jessijkt48', 'jkt48.official']; 
 
-// Memeriksa status siaran langsung dan mengirim notifikasi saat ini untuk setiap username
+// Check live streaming status and send notifications right now for each username
 usernames.forEach((username) => {
   checkLiveStatusAndSendNotification(username);
 });
 
-// Memeriksa status siaran langsung dan mengirim notifikasi setiap 3 menit untuk setiap username
+// Check live streaming status and send notifications every 3 minutes for each username
 setInterval(() => {
   usernames.forEach((username) => {
     checkLiveStatusAndSendNotification(username);
