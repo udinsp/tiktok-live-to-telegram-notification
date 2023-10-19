@@ -38,7 +38,7 @@ This script allows you to monitor TikTok users' live streaming status and send n
 6. **Run the Script**: Open the terminal or command prompt again, navigate to the directory where you've saved the repository, and run the script with the following command:
 
     ```bash
-    node script.js
+    node run.js
     ```
 
     The script will check the live streaming status and send a notification once when it's first run and then every 3 minutes.
