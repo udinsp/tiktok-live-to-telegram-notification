@@ -20,7 +20,7 @@ This script allows you to monitor TikTok users' live streaming status and send n
     npm install
     ```
 
-4. **Configure Telegram Token and Chat ID**: You need to replace the Telegram token and chat ID in the script with your Telegram account information. You can do this by editing the following part of the script:
+4. **Configure Telegram Token and Chat ID**: You need to replace the [Telegram token](https://www.google.com/search?q=how+to+get+telegram+token) and [chat ID](https://www.google.com/search?q=How+to+Find+a+Chat+ID+in+Telegram) in the script with your Telegram account information. You can do this by editing the following part of the script:
 
     ```javascript
     const telegramApiUrl = 'https://api.telegram.org/xxxxxxx/sendMessage'; // Telegram Token
